@@ -1,0 +1,134 @@
+---
+title: "ECOL 597 class notes"
+output: html_document
+date: "last knit `r Sys.time()`"
+---
+
+
+#  2021-01-19
+
+Chris, Lillian (Lilly)
+
+
+
+#  2021-01-21
+
+Sydney- NC, Rome
+
+keyword library- lists the words you can't use in Python
+
+use `input` to allow user input to assign an object later 
+
+for logicals (booleans) in Python, case is important: True or False
+ - true is 1, false is 0. Same as R. 
+
+data types....float vs integer. Can't multiply integers? First have to convert to float? [**follow-up**: it didn't work because one of the varibales was saved as a string.]
+
+adding strings together: this is like `paste()` or `stringr::str_c()` in R
+
+and you can vectorize it by multiplying one or more strings by a number
+
+
+
+
+
+
+
+
+#2021-01-26
+
+Sam, Masie
+
+conditionals and logical operators 
+
+while loops : use a flag at the beginning 
+example of asking user to input the answer to "what is 2+3?"
+
+In the end what matters is that what follows the `while` must ONLY evaluate if the condition is satisfied 
+
+
+`not` has a special meaning in Python; it is similar to !=
+
+5 min break, talked to Jayden about programming languages 
+
+
+for loops  vs while loops.....counter is incremented at end of the "action"
+
+lists in Python are composed using square brackets 
+
+for i in range(10) . do something. However range starts at 0 not 1. EXCEPT if you give it a start and stop number it will stop at the stop number. In other words, the behavior of `range` changes depending on the arguments you pass it. Best way to avoid problems is to explicitly state what the arguments are. 
+
+
+
+# 2021-01-28
+
+Why use functions ?
+
+modularity, shareability, debugging
+
+local vs global variables (I think this is called lexical scoping ?)
+
+parameter vs argument. Semantically different so good to know this but in practice they are used interchangeably. 
+
+as a good practice, try to never use a global variable inside a function. You might get behavior you weren't expecting and more importantly it is NOT PORTABLE. 
+
+
+to allow a parameter to have an arbitrary number of arguments, use the *operator prior to the parameter when defining the function
+
+- alternatively, the parameter can just be typed as is when defining the function, but then you have to pass a list as the argument. 
+
+skpping ahead so we can cover random number generation
+
+they are never truly random....has something to do with your system clock and a complicated formula that decides what to do next. Keep this in mind when running simulations. 
+
+Ability to set random seed (glad to have discovered this in R)
+
+differences library, module, and package are minute although real; many people use them interchangeably. 
+
+When you refer to functions in python, you always use the library name and then a dot to precede the function. same as `pkg::function()` in R.
+
+In Python, creating a module is as simple as saving a python file and then calling `import <filepath>. 
+
+
+
+
+# 2021-02-02
+
+- long asides on homework and individual questions 
+- installed Anaconda
+-eventually started discussing strings
+  - indexing is pretty similar to R....a few important differenes 
+- use a negative number to indiate you want to start at the end of the string when looking for a single character. Just like **stringr**
+  - the colon operator can be used before OR after a number when defining a sequence, for example word[:-5] would give all characters from zero to the one 5 from the end. The starting the count at zero thing does not apply for negative numbers. 
+ - the `in` operator is useful; it is similar to `%in%` in R. Returns a logical about whether a given string is detected inside another string
+- to change case, type the stringa and  `.upper()`
+  - this is the general way to apply a function to an existing object, i.e. appending an existing list.
+
+
+# 2021-02-23
+
+Starting R 
+
+logicals - the vectorized nature of `&` c.f. `&&`
+
+```{r}
+a <- c(5, 10, 15, 20)
+b <- c(2, 4, 16, 256)
+
+# try it with slicing 
+
+a[a > b & b < a]
+a[a > b && b < a]
+a[a > 5 & a < 20]
+
+
+```
+
+Take user input with `readline()`
+
+```{r}
+
+sort(sample(1:10), decreasing = T)
+sample(1:10)
+```
+

@@ -1,0 +1,124 @@
+---
+title: "R Homework Day 3 - **ggplot2** practice"
+mainfont: Arial
+codefont: Lucida Console
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: default
+  html_notebook: default
+date: "Due date 2021-03-04, document compiled ``r format(Sys.time(), format = '%Y-%M-%d %H:%m %p')``"
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = T, warning = T,
+                      message = T,
+                      #out.width = "80%",
+                      fig.asp = 9/16
+                      )
+
+tidy.opts=list(width.cutoff=80)
+```
+
+# Problem 1: `iris` dataset
+
+## **TL;DR** 
+I went a little crazy here. Most of the steps below are totally un-necessary for our assignment - but it gave me some great practice with data wrangling. I never like to be the "over-achiever" type & I wrote all this down only so I could refer to the techniques later. In other words I was not planning to include all this extra narrative in my homework submission. However I thought even if you aren't guzzling **tidyverse** Kool-Aid (as I am), maybe you would find one or two of the  functions useful (`matches()` and `separate()` are particularly powerful). If not, just skip to the plots!
+
+
+[link to .Rmd source document]()
+
+```{r message=F, warning=F}
+# load the tidyverse plus some add-on packages for ggplot2 and ecmfuns
+xfun::pkg_attach(c("tidyverse", "scales", "ggtext", "ecmfuns"))
+```
+
+## Data cleaning 
+
+First I did some data wrangling to change "Sepal.Width" to "Width" further upstream, without losing information about which plant part was measured.
+This isn't really needed for this problem because the axis labels can easily be added with **ggplot2** functions - but sometimes it is nice to clean the names up before and reduce the amount of tweaking in the call to `ggplot()`.
+
+First, I added a column to uniquely identify each observation, called "specimen". Second, I changed the `Species` values to title case with **stringr** and added underscores on each end so they can be parsed as Markdown by **ggtext**. Next, I pivoted the data from wide format to long format, to make plant part and measurement separate variables. To do this based on the right columns, I passed the **dplyr** helper function `matches()` and a regular expression to the `cols` argument of `pivot_longer()`. This pivoted any columns containing the case-insensitive pattern \<plant part\>.\<dimension\>.  Finally I used `dplyr::separate()` to make plant part and dimension into separate variables. If I were doing a real data analysis this would make plotting other aspects of this data really easy later.
+
+```{r}
+iris_tidy <- iris %>% 
+  rownames_to_column("specimen") %>%
+  mutate(Species = factor(paste0("_", stringr::str_to_title(Species), "_"))) %>%
+  pivot_longer(cols = dplyr::matches("(sepal|petal)\\.(width|length)", ignore.case = T),
+               names_to = 'measurement',
+               values_to = 'cm') %>% 
+  tidyr::separate(col = measurement, sep = "\\.", into = c("plant_part", "dimension")) %>% 
+  mutate(dimension = paste(dimension, "(cm)"))
+
+head(iris_tidy, n= 3)
+```
+
+I also thought it would be neat to color the flowers based on their real color. I found the eyedropper tool in Firefox, it is super cool! I used it to extract the hex code of a pixel from an image of each species on Google images. Using the color to distinguish species here is not a particularly effective visualization because they all have pretty similar colors, but `scale_*_identity` is a very useful feature of ggplot2 in some instances.
+
+```{r}
+
+iris_col_lookup <- data.frame(
+  Species = unique(iris_tidy$Species),
+  hex_code = c("#a076d4", "#5851c3", "#7d5dad")
+  )
+# codes pulled from Google images with Firefox eyedropper tool
+
+iris_col_lookup
+
+```
+
+I then joined the "tidy" data set with the table of color values and filtered to include only sepal widths. To plot width vs. length I actually have to pivot the data into wide format again. Note that every individual observation is now collapsed back into a single row:
+
+```{r}
+plotting_data <- iris_tidy %>% 
+  left_join(iris_col_lookup) %>% 
+  pivot_wider(names_from = dimension,
+              values_from = cm) %>% 
+  filter(plant_part == "Sepal")
+
+head(plotting_data, n= 3)
+```
+
+Now generate the plot layer-by-layer:
+
+```{r}
+# Pseudocode/comments: 
+
+# pass joined data frame to first argument of ggplot() with
+# the pipe 
+
+# plot a separate regression line for each species, but don't show the
+# line in the legend 
+
+# add a layer of slightly transparent points and increase their size 
+
+# use `scale_color_identity()` to color the points based on the column of 
+# values add a legend to distinguish the species and center the title
+
+# add a title adjust some other theme elements with a theme I previously built
+# on top of cowplot and ggtext
+
+p <- plotting_data %>%
+  ggplot(aes(`Width (cm)`, `Length (cm)`, color = hex_code)) +
+  geom_smooth(method = lm,
+              formula = y ~ x,
+              se = FALSE,
+              show.legend = FALSE,
+              size = 0.25,
+              linetype = 'longdash') +
+  geom_point(alpha = 3 / 4,  size = 2.5) +
+  scale_color_identity(guide = 'color', 
+                       labels = levels(plotting_data$Species))+
+  guides(color = guide_legend('Species', title.hjust = 0.5)) +
+  labs(title = "Sepal dimensions of 3 _Iris_ spp.") +
+  theme_ecm_scatter()
+
+p
+
+```
+
+Unfortunately because `scale_color_identity()` maps the colors to the `hex_code()`column, it treats these hex color strings as the text to display in the legend. Also, no legend is shown by default when using `scale_color_identity()`. Adding some extra arguments to `scale_color_identity()` fixes both these issues. 
+
+

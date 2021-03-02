@@ -1,0 +1,8 @@
+define number of random numbers to choose and a range within which they can fall 
+start `for` loop
+pick first random number 
+pick another random number 
+check if the second number is the same as the first one 
+if they do match, pick a new one 
+repeat until they don't match
+stop once list length is desired length (i.e. break loop)
