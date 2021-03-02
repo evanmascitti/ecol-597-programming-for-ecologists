@@ -1,0 +1,36 @@
+---
+output: html_document
+title: ECOL 597
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# ecol-597-programming-for-ecologists
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+This repository tracks my homework for ECOL 597.
+
+Recent assignments:
+
+```{r echo=F}
+library(magrittr)
+filepaths <- paste0("(", list.files(pattern = "\\.py$|\\.R|\\.Rmd", recursive = T, full.names = T), ")") 
+filetext <- paste0("[", stringr::str_remove_all(filepaths, pattern = "\\./|\\(|\\)"), "]")
+
+links <- paste0(filetext, filepaths) %>% 
+  as.data.frame()
+
+# links %>% 
+#   kableExtra::kbl()
+```
+
+`r stringr::str_c(links[[1]], collapse = "<br>")`
