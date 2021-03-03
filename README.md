@@ -8,6 +8,8 @@ ECOL 597
 <!-- badges: start -->
 <!-- badges: end -->
 
+[**Github pages link**](https://evanmascitti.github.io/ecol-597-programming-for-ecologists/)
+
 This repository tracks my homework for ECOL 597.
 
 Recent assignments:
