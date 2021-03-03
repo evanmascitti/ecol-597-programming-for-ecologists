@@ -1,51 +1,53 @@
 ---
 title: "R Homework Day 3 - **ggplot2** practice"
+author: Evan Mascitti
 mainfont: Arial
 codefont: Lucida Console
+date: "Due date 2021-03-04, document compiled ``r format(Sys.time(), format = '%Y-%m-%d %l:%m %p')``"
+linkcolor: blue
+number_sections: false
+toccolor: blue
+toc: false
+df_print: tibble
 output:
-  pdf_document:
+  bookdown::pdf_document2:
     latex_engine: xelatex
     highlight: default
-  html_notebook: default
-date: "Due date 2021-03-04, document compiled ``r format(Sys.time(), format = '%Y-%M-%d %H:%m %p')``"
-editor_options: 
-  chunk_output_type: inline
+    includes:
+      in_header: preamble.tex
 ---
 
 ```{r setup, include=F}
 knitr::opts_chunk$set(echo = T, warning = T,
                       message = T,
-                      #out.width = "80%",
-                      fig.asp = 9/16
-                      )
-
+                      fig.asp = 9/16)
 tidy.opts=list(width.cutoff=80)
 ```
 
+# **TL;DR** 
+
+I went a bit overkill on this assignment. I try not to be the "over-achiever" type but it was a nice chance to practice data wrangling and learn a couple new functions. 
+Also spent the time to play around with Github pages and figured out how to create a link for the reader to [**download the source .Rmd document**](https://evanmascitti.github.io/ecol-597-programming-for-ecologists/R_Homework_Day3_Mascitti.Rmd). Pretty cool!
+
 # Problem 1: `iris` dataset
 
-## **TL;DR** 
-I went a little crazy here. Most of the steps below are totally un-necessary for our assignment - but it gave me some great practice with data wrangling. I never like to be the "over-achiever" type & I wrote all this down only so I could refer to the techniques later. In other words I was not planning to include all this extra narrative in my homework submission. However I thought even if you aren't guzzling **tidyverse** Kool-Aid (as I am), maybe you would find one or two of the  functions useful (`matches()` and `separate()` are particularly powerful). If not, just skip to the plots!
-
-
-[link to .Rmd source document]()
 
 ```{r message=F, warning=F}
-# load the tidyverse plus some add-on packages for ggplot2 and ecmfuns
-xfun::pkg_attach(c("tidyverse", "scales", "ggtext", "ecmfuns"))
+# load the tidyverse plus some add-on packages for ggplot2 and some of my own functions
+
+xfun::pkg_attach(c("tidyverse", "scales", "ggtext", "ggforce", "ecmfuns"))
 ```
 
-## Data cleaning 
+## Data wrangling 
 
-First I did some data wrangling to change "Sepal.Width" to "Width" further upstream, without losing information about which plant part was measured.
-This isn't really needed for this problem because the axis labels can easily be added with **ggplot2** functions - but sometimes it is nice to clean the names up before and reduce the amount of tweaking in the call to `ggplot()`.
+```{r initial-data-wrangling}
 
-First, I added a column to uniquely identify each observation, called "specimen". Second, I changed the `Species` values to title case with **stringr** and added underscores on each end so they can be parsed as Markdown by **ggtext**. Next, I pivoted the data from wide format to long format, to make plant part and measurement separate variables. To do this based on the right columns, I passed the **dplyr** helper function `matches()` and a regular expression to the `cols` argument of `pivot_longer()`. This pivoted any columns containing the case-insensitive pattern \<plant part\>.\<dimension\>.  Finally I used `dplyr::separate()` to make plant part and dimension into separate variables. If I were doing a real data analysis this would make plotting other aspects of this data really easy later.
+# create unique identifier for each observation
+# pivot longer to create new variables for each observation 
+# tweak contents of strings with regular expressions and `paste0()
 
-```{r}
 iris_tidy <- iris %>% 
   rownames_to_column("specimen") %>%
-  mutate(Species = factor(paste0("_", stringr::str_to_title(Species), "_"))) %>%
   pivot_longer(cols = dplyr::matches("(sepal|petal)\\.(width|length)", ignore.case = T),
                names_to = 'measurement',
                values_to = 'cm') %>% 
@@ -55,39 +57,61 @@ iris_tidy <- iris %>%
 head(iris_tidy, n= 3)
 ```
 
-I also thought it would be neat to color the flowers based on their real color. I found the eyedropper tool in Firefox, it is super cool! I used it to extract the hex code of a pixel from an image of each species on Google images. Using the color to distinguish species here is not a particularly effective visualization because they all have pretty similar colors, but `scale_*_identity` is a very useful feature of ggplot2 in some instances.
 
-```{r}
+```{r color-lookup-table, message=F}
 
-iris_col_lookup <- data.frame(
+# create look-up table for flower colors by using single pixels from the image below
+# I used the eyedropper tool in Firefox to copy the hex codes 
+
+hex_codes <- read_csv("iris-hex-codes.csv") 
+
+iris_col_lookup <- tidyr::crossing(
   Species = unique(iris_tidy$Species),
-  hex_code = c("#a076d4", "#5851c3", "#7d5dad")
-  )
-# codes pulled from Google images with Firefox eyedropper tool
+  plant_part = c("Petal", "Sepal"))%>% 
+  left_join(hex_codes)
 
-iris_col_lookup
+head(iris_col_lookup, 3)
 
 ```
 
-I then joined the "tidy" data set with the table of color values and filtered to include only sepal widths. To plot width vs. length I actually have to pivot the data into wide format again. Note that every individual observation is now collapsed back into a single row:
 
-```{r}
+(ref:foo) Colors of 3 _Iris_ species. Source: [Google images](https://www.google.com/search?q=iris+setosa+sepals&client=firefox-b-1-d&sxsrf=ALeKk01vLpOqkDIGDOP-ydo1HKLvXH3c5Q:1614797873217&source=lnms&tbm=isch&sa=X&ved=2ahUKEwiGrffs5pTvAhV0MlkFHfBaD4wQ_AUoAXoECAkQAw&biw=1707&bih=607#imgrc=ugx_coi7mCXU4M)
+
+
+```{r iris-photo, echo=F, out.width = "80%", fig.cap= '(ref:foo)'}
+
+knitr::include_graphics("iris-colors.png")
+```
+
+
+```{r plotting-data-1a, message=F}
+# build a tibble which can be used for both plots 
+# join with color codes
+# pivot back to wide format 
+# wrap species values in underscores so they can be parsed as Markdown later
+
 plotting_data <- iris_tidy %>% 
   left_join(iris_col_lookup) %>% 
   pivot_wider(names_from = dimension,
               values_from = cm) %>% 
+  mutate(Species = factor(paste0("_I. ", Species, "_"))) 
+
+# for the first plot, filter to include only sepal data
+plotting_data_1a <- plotting_data %>% 
   filter(plant_part == "Sepal")
 
-head(plotting_data, n= 3)
+head(plotting_data_1a, n= 3)
 ```
 
-Now generate the plot layer-by-layer:
+## Plot for part 1a
 
-```{r}
-# Pseudocode/comments: 
+```{r plot-1a, fig.cap='Sepal length and width are correlated within species, but the overall association is weak when all species are included.'}
+# generate plot layer-by layer
 
 # pass joined data frame to first argument of ggplot() with
 # the pipe 
+
+# plot an overall regression line but, in grey so it is less of a focus
 
 # plot a separate regression line for each species, but don't show the
 # line in the legend 
@@ -95,13 +119,22 @@ Now generate the plot layer-by-layer:
 # add a layer of slightly transparent points and increase their size 
 
 # use `scale_color_identity()` to color the points based on the column of 
-# values add a legend to distinguish the species and center the title
+# color values, add a legend to distinguish the species, and center the title
 
-# add a title adjust some other theme elements with a theme I previously built
-# on top of cowplot and ggtext
+# add a title and adjust some other theme elements with a theme I previously 
+# built on top of cowplot and ggtext
 
-p <- plotting_data %>%
+p1 <- plotting_data_1a %>%
   ggplot(aes(`Width (cm)`, `Length (cm)`, color = hex_code)) +
+  geom_smooth(aes(color = NULL),
+              alpha = 1/8,
+              method = lm,
+              formula = y ~ x,
+              se = T,
+              show.legend = FALSE,
+              size = 0.5,
+              color = 'grey75',
+              linetype = 'dotted')+
   geom_smooth(method = lm,
               formula = y ~ x,
               se = FALSE,
@@ -110,15 +143,127 @@ p <- plotting_data %>%
               linetype = 'longdash') +
   geom_point(alpha = 3 / 4,  size = 2.5) +
   scale_color_identity(guide = 'color', 
-                       labels = levels(plotting_data$Species))+
+                       labels = levels(plotting_data_1a$Species))+
   guides(color = guide_legend('Species', title.hjust = 0.5)) +
   labs(title = "Sepal dimensions of 3 _Iris_ spp.") +
   theme_ecm_scatter()
 
-p
+print(p1)
 
 ```
 
-Unfortunately because `scale_color_identity()` maps the colors to the `hex_code()`column, it treats these hex color strings as the text to display in the legend. Also, no legend is shown by default when using `scale_color_identity()`. Adding some extra arguments to `scale_color_identity()` fixes both these issues. 
+_____________
 
 
+## Plot for problem 1b
+
+First a bit more data wrangling:
+
+```{r part1b-data-wrangling, message=F}
+
+# make the plant parts plural
+
+plotting_data_1b <- plotting_data %>% 
+  mutate(plant_part = paste0(plant_part, "s"))
+
+
+# create separate data set for the scale bars: include positions and 
+# label text 
+
+scale_bar_data <- plotting_data_1b %>% 
+  group_by(Species, plant_part) %>% 
+  summarize(yend = 0.25+0.5*max(`Width (cm)`) ) %>% 
+  mutate(y = yend,
+         x = -0.5,
+         xend = 0.5,
+         text = '1 cm')
+
+```
+
+\newpage 
+
+Now make the plot:
+
+```{r make-ellipse-plot, fig.cap="The size and aspect ratio of flower components vary by both species and plant part."}
+# build plot approximating plant dimensions
+# draw an ellipse for every observation with ggforce package
+# width and height reflect the measurements
+# remove extra 'non-data ink'
+# add layers to show scale bar and text
+# color ellipses based on plant part
+# lock coordinate system to 1:1 ratio
+# turn off axis breaks
+# add titles to plot and axes
+# tweak theme elements
+
+p2 <- ggplot()+
+ ggforce::geom_ellipse(data = plotting_data_1b,
+               aes(x0 = 0, y0 = 0, a = `Length (cm)`/2, b = `Width (cm)` /2, 
+                   angle = 0, color = alpha(hex_code, 1/10),
+                   fill = alpha(hex_code, 1/100)))+
+  geom_segment(data = scale_bar_data,
+               mapping = aes(
+                 x = -0.5, y= y, xend = 0.5, yend = yend),
+               color = 'grey75', size = 1)+
+  geom_text(data = scale_bar_data,
+            aes(x= 0, y = y, label = text), nudge_y = 0.4, 
+            color = 'grey50', size = 8/.pt, hjust = 0.5)+
+  scale_fill_identity()+
+  scale_color_identity()+
+  facet_grid(plant_part~Species)+
+  coord_fixed()+
+  scale_x_continuous(labels = NULL)+
+  scale_y_continuous(labels = NULL)+
+  labs(title = "_Iris_ spp. flower parts approximated as true ellipsoids",
+       x = 'Length (cm)', y= 'Width (cm)')+
+  cowplot::theme_cowplot()+
+  cowplot::background_grid(color.major = 'grey97',
+                           size.major = 0.25)+
+  theme(strip.text.x = element_markdown(),
+        strip.text.y = element_text(
+          face = 'bold', angle = 0, vjust = 0.5, hjust = 0.5),
+        strip.background = element_blank(),
+        plot.title = element_markdown(hjust = 0.5),
+        strip.placement = 'inside',
+        axis.line = element_blank(),
+        axis.ticks = element_blank()
+        )
+
+print(p2)
+```
+
+___
+
+\newpage 
+
+# Problem 2
+
+
+I chose a following figure from _The Economist_ (see below).
+  
+(ref:economist-fig) Economist figure from [**current issue**](https://www.economist.com/weeklyedition/2021-02-27) (Feb. 27, 2021)
+  
+```{r economist-fig, echo=F, out.width="80%", fig.align='center', fig.cap= '(ref:economist-fig)'}
+knitr::include_graphics("economist-turkey-russia-comparison.jpg")
+```
+
+It tells a pretty compelling story: Russia has more land than Turkey, but they are more similar in terms of population and wealth. Turkey spends much less on its military but employs a similar number of troops.
+
+I like this style of figure; it is similar to a "Cleveland dot plot" (after [**William S. Cleveland**](https://en.wikipedia.org/wiki/William_S._Cleveland) who popularized its use). 
+
+In this plot, the layers (re: Grammar of Graphics) are:
+  
+\begin{onehalfspacing} 
+\begin{enumerate}
+\item a horizontal axis, with a continuous scale where the left end represents a true zero for each metric (thin grey line). The range of the scale is free to vary within each sub-panel.
+\item the **difference** between the two countries for every metric (thick grey line)
+\item the actual values of each metric (colored dots)
+\item a legend to distinguish between the dot colors
+\item text labels annotating the data values
+\item formatted y-axis text describing the metric's nature and its units
+\item Other annotations: a title, subtitle, caption
+\item this plot represents small multiples, faceted by metric and arranged in a single column
+\item a "theme" which inclues a color scheme and various font faces (there is actually an open-source theme based on the Economist in the \href{https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/}{\strong{ggthemes}} package
+
+\end{enumerate}
+\end{onehalfspacing}

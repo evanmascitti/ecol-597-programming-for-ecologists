@@ -1,0 +1,7 @@
+Species,plant_part,hex_code
+setosa,Petal,#7f8ce1
+setosa,Sepal,#7868ea
+versicolor,Petal,#b792d8
+versicolor,Sepal,#873dc6
+virginica,Petal,#9287d9
+virginica,Sepal,#6e43cf
