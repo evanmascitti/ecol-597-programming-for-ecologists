@@ -38,8 +38,8 @@ tidy.opts=list(width.cutoff=79)
 
 # **TL;DR** 
 
-I went a little overkill on this assignment. I try not to be the "over-achiever" type but it was a nice chance to practice data wrangling and learn a couple new functions. 
-Also spent the time to play around with Github pages and figured out how to create a link to [**the source .Rmd document**](https://raw.githubusercontent.com/evanmascitti/ecol-597-programming-for-ecologists/master/R_Homework_Day3_Mascitti.Rmd). Pretty cool!
+Went a little overkill on this assignment; I try not to be the "over-achiever" type but it was a fun chance to practice data wrangling and learn some new functions. 
+Also learned how to link to my [**source .Rmd document**](https://raw.githubusercontent.com/evanmascitti/ecol-597-programming-for-ecologists/master/R_Homework_Day3_Mascitti.Rmd) with GitHub, although in this case the code is not directly executable because I used a few external files. Pretty cool!
 
 # Problem 1: `iris` dataset
 
@@ -125,7 +125,7 @@ head(plotting_data_1a, n= 3)
 
 ## Plot for part 1a
 
-```{r plot-1a, fig.cap='Sepal length and width are correlated within species, but the overall association is weak when all species are included.'}
+```{r plot-1a, fig.cap='Sepal length and width are positively correlated within species, but the overall association is weak when all species are included.'}
 # generate plot layer-by layer
 
 # pass joined data frame to first argument of ggplot() with
