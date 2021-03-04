@@ -3,7 +3,7 @@ title: "R Homework Day 3 - **ggplot2** practice"
 author: Evan Mascitti
 mainfont: Arial
 codefont: Lucida Console
-date: "Due date 2021-03-04, document compiled ``r format(Sys.time(), format = '%Y-%m-%d %l:%m %p')``"
+date: "Due date 2021-03-04, document compiled ``r format(Sys.time(), format = '%Y-%m-%d %l:%M %p')``"
 linkcolor: blue
 number_sections: false
 toccolor: blue
@@ -13,21 +13,33 @@ output:
   bookdown::pdf_document2:
     latex_engine: xelatex
     highlight: default
-    includes:
-      in_header: preamble.tex
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage[none]{hyphenat}
+  - \usepackage[font=small,labelfont=bf]{caption}
+  - \usepackage{float}
+  - \usepackage{setspace} % line spacing package for varying within the document
+  - \renewcommand{\topfraction}{.85}
+  - \renewcommand{\bottomfraction}{.7}
+  - \renewcommand{\textfraction}{.15}
+  - \renewcommand{\floatpagefraction}{.66}
+  - \setcounter{topnumber}{3}
+  - \setcounter{bottomnumber}{3}
+  - \setcounter{totalnumber}{4}
 ---
 
 ```{r setup, include=F}
 knitr::opts_chunk$set(echo = T, warning = T,
                       message = T,
                       fig.asp = 9/16)
-tidy.opts=list(width.cutoff=80)
+tidy.opts=list(width.cutoff=79)
 ```
 
 # **TL;DR** 
 
-I went a bit overkill on this assignment. I try not to be the "over-achiever" type but it was a nice chance to practice data wrangling and learn a couple new functions. 
-Also spent the time to play around with Github pages and figured out how to create a link for the reader to [**download the source .Rmd document**](https://evanmascitti.github.io/ecol-597-programming-for-ecologists/R_Homework_Day3_Mascitti.Rmd). Pretty cool!
+I went a little overkill on this assignment. I try not to be the "over-achiever" type but it was a nice chance to practice data wrangling and learn a couple new functions. 
+Also spent the time to play around with Github pages and figured out how to create a link to [**the source .Rmd document**](https://raw.githubusercontent.com/evanmascitti/ecol-597-programming-for-ecologists/master/R_Homework_Day3_Mascitti.Rmd). Pretty cool!
 
 # Problem 1: `iris` dataset
 
@@ -63,7 +75,15 @@ head(iris_tidy, n= 3)
 # create look-up table for flower colors by using single pixels from the image below
 # I used the eyedropper tool in Firefox to copy the hex codes 
 
-hex_codes <- read_csv("iris-hex-codes.csv") 
+hex_codes <- tibble::tribble(
+  ~Species, ~plant_part, ~hex_code,
+  "setosa", "Sepal", "#7f8ce1",
+  "setosa", "Petal", "#7868ea",
+  "versicolor", "Sepal", "#b792d8",
+  "versicolor", "Petal", "#873dc6",
+  "virginica", "Sepal", "#9287d9",
+  "virginica", "Petal", "#6e43cf")
+   
 
 iris_col_lookup <- tidyr::crossing(
   Species = unique(iris_tidy$Species),
@@ -180,8 +200,6 @@ scale_bar_data <- plotting_data_1b %>%
 
 ```
 
-\newpage 
-
 Now make the plot:
 
 ```{r make-ellipse-plot, fig.cap="The size and aspect ratio of flower components vary by both species and plant part."}
@@ -239,7 +257,7 @@ ___
 # Problem 2
 
 
-I chose a following figure from _The Economist_ (see below).
+I chose a figure from _The Economist_.
   
 (ref:economist-fig) Economist figure from [**current issue**](https://www.economist.com/weeklyedition/2021-02-27) (Feb. 27, 2021)
   
