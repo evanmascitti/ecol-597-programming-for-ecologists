@@ -1,0 +1,31 @@
+some notes from today's class
+
+DISTINCT = R unique()
+WHERE = R dplyr::filter()
+  - this is very similar
+
+LIKE and wildcards - % and GLOB
+
+making summaries on the fly:
+
+  - AVG and GROUP BY
+
+change name of variable (mutate or rename) with AS
+
+- when running a SELECT query remember the result is a temporary thing; as soon
+as you make another query it will be gone
+
+- the .mode list turns on delimiter setting; then set separator with .separator.
+Finally call .output FILENAME
+
+sqlite3 is sloppy about capitalization; the standard SQL query commands will still work
+even if they are not capitalized. Something to be aware of.
+
+Keep the order straight: WHERE goes before GROUP BY but before HAVING
+
+_____
+
+
+# Joining
+
+- only 2 types of joins can be done by sqlite3 - inner joins and left joins

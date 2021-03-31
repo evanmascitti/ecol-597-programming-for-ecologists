@@ -1,0 +1,6 @@
+CREATE VIEW IF NOT EXISTS summary AS SELECT Spp, OTU, Num 
+  FROM tNumber 
+  INNER JOIN tOTU 
+    ON tNumber."IDOTU" = tOTU."IDOTU" 
+  INNER JOIN tSpp
+    ON tNumber."IDSpp" = tSpp."IDSpp";

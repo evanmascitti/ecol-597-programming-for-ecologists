@@ -1,0 +1,3 @@
+Initially I installed sqlite3 with the one-liner `choco install sqlite3`. I was so enamored that this actually worked on the first try that I completely ignored the instructions from class. After some confusion I realized that the version I had downloaded did not include the command-line shell for Windows. Therefore I went to the website, manually downloaded the 3 files and unpacked them into this directory.
+
+Eventually I also realized that sqlite3 cannot be run in the Bash shell; I am now operating inside the Windows cmd Command Prompt program. It doesn't have many of the commands used in Bash which is annoying. But I won't be using those for this anyway so it's OK. Finally got sqlite3 up and running. 

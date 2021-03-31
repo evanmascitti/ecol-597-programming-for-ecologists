@@ -1,0 +1,101 @@
+---
+title: SQL Homework 2
+author: Evan Mascitti
+date: 2021-03-31
+mainfont: Arial
+linestretch: 1.15
+highlight: tango
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: sql-hw2-preamble.tex
+---
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = F, message = F, warning = F, comment = "", results = 'asis')
+knitr::opts_knit$set(root.dir = here::here('SQL', 'homework2'))
+
+show_output <- function(x){
+  cat("```SQL", xfun::read_utf8(x), "```", sep = "\n")
+}
+```
+
+- I learned how to read in the results from `sqlite3` output with R Markdown and a few **knitr** tricks...pretty fun to learn and a saved lot of copy-pasting! 
+
+```{r comment="#", results='markup', echo=T}
+# navigate to correct wd, start sqlite3 and set some options 
+```
+
+```bash
+cd SQL/homework2
+
+sqlite3
+.echo on
+.trace
+.header on
+.mode column
+```
+
+# Problem 1
+
+## Part a)
+
+```{r prob1a}
+show_output('prob1a.txt')
+```
+
+
+## Part b)
+
+```{r}
+show_output('prob1b.txt')
+```
+
+
+# Problem 2
+
+## Part a)
+
+```{r}
+show_output('prob2a.txt')
+```
+
+
+## Part b)
+
+```{r}
+show_output('prob2b.txt')
+```
+
+
+## Part c)
+
+```{r}
+show_output('prob2c.txt')
+cat("\n")
+cat("```SQL", ".save summary.db", "```", sep = "\n")
+```
+
+
+## Part d)
+
+```{r}
+show_output('prob2d.txt')
+```
+
+
+## Part e)
+
+```{r}
+show_output('prob2e.txt')
+```
+
+
+## Part f)
+
+```{r}
+show_output('prob2f.txt')
+```
+
+
+

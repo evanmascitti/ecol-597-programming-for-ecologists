@@ -1,0 +1,8 @@
+rowid will be assigned as the primary key if none is supplied 
+
+
+useful for the ORDER BY part of the query
+
+casting with CAST() to change data type on the fly (i.e. explicit coercion)
+
+.save vs .dump vs .output

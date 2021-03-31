@@ -1,0 +1,20 @@
+SELECT pop, COUNT(pop) AS numInd 
+  FROM lohr_and_haag 
+  WHERE ad > 55 GROUP BY pop;
+pop         numInd    
+----------  ----------
+AST         142       
+AST5        83        
+BEOM        71        
+BOL         26        
+ISM         62        
+ISM12       20        
+KMG         100       
+KOR         99        
+MOS         110       
+N45         13        
+NFN         101       
+SKO         10        
+VOL         85        
+VRI         31        
+WTE         142       

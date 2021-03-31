@@ -1,0 +1,9 @@
+SELECT Spp, MIN(Num), MAX(Num), AVG(Num) 
+  FROM summary
+  WHERE Spp LIKE "Nasutiterm%" AND Num> 0
+  GROUP BY Spp;
+Spp                    MIN(Num)    MAX(Num)    AVG(Num)        
+---------------------  ----------  ----------  ----------------
+Nasutitermes_corniger  1           109         5.46666666666667
+Nasutitermes_takasago  1           258         7.5631067961165 
+Nasutitermitinae_Uncl  1           367         3.1863299956465 

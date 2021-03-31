@@ -1,0 +1,13 @@
+SELECT OTU, COUNT(Num) AS "NumSpp" 
+  FROM summary
+  WHERE Num > 0
+  GROUP BY OTU
+  HAVING NumSpp >= 7;
+OTU         NumSpp    
+----------  ----------
+OTU_1432    7         
+OTU_189     9         
+OTU_240     7         
+OTU_689     7         
+OTU_719     8         
+OTU_881     7         

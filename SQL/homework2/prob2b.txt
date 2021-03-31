@@ -1,0 +1,18 @@
+SELECT Spp, OTU, Num FROM tNumber 
+  INNER JOIN tOTU 
+    ON tNumber."IDOTU" = tOTU."IDOTU" 
+  INNER JOIN tSpp
+    ON tNumber."IDSpp" = tSpp."IDSpp"
+  LIMIT 10;
+Spp                     OTU         Num       
+----------------------  ----------  ----------
+Microcerotermes_parvus  OTU_1       1682      
+Microcerotermes_parvus  OTU_2       1273      
+Microcerotermes_parvus  OTU_5       767       
+Microcerotermes_parvus  OTU_67      134       
+Microcerotermes_parvus  OTU_65      132       
+Microcerotermes_parvus  OTU_53      167       
+Microcerotermes_parvus  OTU_7       703       
+Microcerotermes_parvus  OTU_50      177       
+Microcerotermes_parvus  OTU_77      125       
+Microcerotermes_parvus  OTU_73      129       

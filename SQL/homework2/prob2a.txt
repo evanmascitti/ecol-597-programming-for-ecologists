@@ -1,0 +1,13 @@
+CREATE TABLE tOTU (
+                  IDOTU INTEGER PRIMARY KEY,
+                  OTU TEXT      
+                  );
+CREATE TABLE tSpp (
+                  IDSpp INTEGER PRIMARY KEY,
+                  Spp TEXT
+                  );
+CREATE TABLE tNumber 
+( "IDOTU" INTEGER,
+	"IDSpp" INTEGER,
+	"Num" INTEGER 
+);

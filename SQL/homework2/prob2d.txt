@@ -1,0 +1,26 @@
+SELECT Spp, COUNT(DISTINCT(OTU)) AS "NumOTU" 
+  FROM summary 
+  WHERE Num > 0
+  GROUP BY Spp
+  ORDER BY NumOTU DESC;
+Spp            NumOTU    
+-------------  ----------
+Cubitermes_sp  5637      
+Neocapriterme  5610      
+Nasutitermiti  4594      
+Termes_hospes  4244      
+Atlantitermes  4217      
+Probosciterme  4210      
+Cornitermes_s  3788      
+Microceroterm  2320      
+Apicotermes_t  513       
+Microceroterm  401       
+Trinerviterme  301       
+Odontotermes_  296       
+Macrotermes_s  257       
+Ophiotermes_s  234       
+Amitermes_mer  228       
+Nasutitermes_  206       
+Cubitermes_ug  200       
+Nasutitermes_  105       
+Macrotermes_s  65        

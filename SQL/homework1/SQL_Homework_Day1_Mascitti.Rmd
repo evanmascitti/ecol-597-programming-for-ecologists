@@ -1,0 +1,155 @@
+---
+title: SQL homework 1
+author: Evan Mascitti
+date: 2021-03-28
+mainfont: Arial
+linestretch: 1.15
+highlight: tango
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    includes:
+      in_header: sql-hw1-preamble.tex
+---
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = F)
+
+```
+
+# Problem 1
+
+I do many different soil tests on the same mixes, but I don't do every test on every mix. Some of the mixes are made at identical ratios, but again not every type of sand and every type of clay are mixed in orthogonal ways. To complicate it even further some mixes are included in multiple experiments. I have been using a lot of duplication in my raw data sheets to keep things from getting mixed up. This diagram shows a few examples where a relational database could be useful. 
+
+```{r}
+knitr::include_graphics('ecm-database-ideas/ecm-relational-database-concept.pdf')
+```
+
+\newpage
+# Problem 2 a.
+
+### Code:
+-  Import table and save it as a new database 
+```SQL
+sqlite3
+
+.mode csv
+
+.import tNumber.csv tNumber
+
+.save tNumber.db
+
+.exit
+```
+
+Read the .db file back into memory
+
+```SQL
+sqlite3
+.open tNumber.db
+```
+
+Confirm that the table is here:
+
+```SQL
+.tables
+```
+
+Turn headers on and print output
+```SQL
+.headers on
+
+.schema tNumber
+SELECT * FROM tNumber ORDER BY IDOTU LIMIT 6;
+SELECT * FROM tNumber ORDER BY IDOTU DESC LIMIT 6;
+
+.quit
+```
+
+### Output: 
+\vspace{12pt}
+
+````SQL
+
+```{r prob2a, comment=""}
+cat(xfun::read_utf8('prob2a.txt'), sep = "\n")
+```
+
+````
+
+# Problem 2 b. 
+
+For this question I manually deleted the first row (i.e. header) of the file tSSP.csv. Then I created a schema:
+
+```SQL
+sqlite3
+
+CREATE TABLE tSPP(
+  IDSpp INTEGER PRIMARY KEY AUTOINCREMENT,
+  Spp TEXT
+  );
+```
+
+Next I imported the data and added a case:
+
+```SQL
+.mode csv
+.import tSPP-no-header.csv tSPP
+INSERT INTO tSPP VALUES(NULL, 'Amitermes floridensis');
+```
+
+And finally I added an entry to the table:
+
+```SQL
+.mode column
+.header on
+
+SELECT * FROM tSPP;
+.quit
+
+```
+\vspace{12pt}
+-  Output: 
+````SQL
+```{r prob2b, comment=""}
+cat(xfun::read_utf8('prob2b.txt'), sep = "\n")
+```
+````
+
+
+# Problem 2 c. 
+
+Load engine and create empty table/schema:
+```SQL
+sqlite3
+
+CREATE TABLE tOTU(
+  IDOTU INTEGER PRIMARY KEY AUTOINCREMENT,
+  OTU TEXT
+);
+```
+
+Load data into empty table:
+```SQL
+.mode csv
+.import tOTU-no-header.csv tOTU
+```
+Print head and tail of table:
+```SQl
+SELECT * FROM tOTU ORDER BY IDOTU LIMIT 6;
+SELECT * FROM tOTU ORDER BY IDOTU DESC LIMIT 6;
+```
+\vspace{12pt}
+````SQL
+```{r prob 2c, comment=""}
+cat(xfun::read_utf8('prob2c.txt'), sep = "\n")
+```
+````
+Save as a database file 
+```SQL
+.save Mikaelyan_et_al_2015_data.db
+.save Mikaelyan_et_al_2015_data.sql
+
+.exit
+```
+

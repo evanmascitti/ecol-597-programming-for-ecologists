@@ -14,4 +14,7 @@ R_Homework_Day3_Mascitti-verbose.Rmd
 *jpeg
 *.JPEG
 *.JPG
+*.db
+*.sql
+*.exe
 
